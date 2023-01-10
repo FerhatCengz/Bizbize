@@ -1,0 +1,79 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
+
+
+
+
+
+// // Import the functions you need from the SDKs you need
+// import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+// // TODO: Add SDKs for Firebase products that you want to use
+// // https://firebase.google.com/docs/web/setup#available-libraries
+
+// // Your web app's Firebase configuration
+// const firebaseConfig = {
+//   apiKey: "AIzaSyAc02M_2Ofx0NJVYUo6lCOeojIuOrGPi_s",
+//   authDomain: "fir-todolist-8d567.firebaseapp.com",
+//   databaseURL: "https://fir-todolist-8d567-default-rtdb.firebaseio.com",
+//   projectId: "fir-todolist-8d567",
+//   storageBucket: "fir-todolist-8d567.appspot.com",
+//   messagingSenderId: "778315616968",
+//   appId: "1:778315616968:web:942ea7fdccbd15191d0bfd",
+// };
+
+// // Initialize Firebase
+// firebase.initializeApp(firebaseConfig);
+
+// const uploadImage = () => {
+//   //Storage Üzerinde ki yolu alır
+//   const ref = firebase.storage().ref();
+
+//   //Yüklenecek Dosyayı alır
+//   const file = document.getElementById("photo").files[0];
+
+//   //Dosyaların benzersiz olması için başına o an ki saniyesinden milisayniyesine olan zamanı başa yazarız ki farlı olsun
+//   const fileName = new Date() + "-" + file.name;
+
+//   //Dosyanın açıklama kısmında ki tipini yazaroz
+//   const metaData = {
+//     contentType: file.type,
+//   };
+
+//   //son işlem olarak
+//   const task = ref.child(fileName + "/" + "Ferhat").put(file, metaData);
+
+//   task
+//     .then((snapshot) => snapshot.ref.getDownloadURL()) // downloadURL verir
+//     .then((url) => {
+//       alert("Image Upload Success");
+//       const uploadImage = document.getElementById("uploadImage");
+//       uploadImage.src = url;
+//     });
+// };
+
+// $("#btnUpload").click(function (e) {
+//   uploadImage();
+// });
+
+// const listRef = firebase.storage().ref();
+
+// listRef
+//   .listAll()
+//   .then((res) => {
+//     res.prefixes.forEach((folderRef) => {
+//       console.log(folderRef);
+//     });
+//     // res.items.forEach((itemRef) => {
+//     //   // All the items under listRef.
+//     // });
+//   })
+//   .catch((error) => {
+//     // Uh-oh, an error occurred!
+//   });

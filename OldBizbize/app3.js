@@ -7,11 +7,6 @@ var config = {
   messagingSenderId: "778315616968",
   appId: "1:778315616968:web:942ea7fdccbd15191d0bfd",
 };
-firebase.initializeApp(config);
-let db = firebase.database();
-
-console.log("firebase => ", firebase);
-///Kod:
 
 window.onbeforeunload = function (event) {
   var message = "Important: Please click on 'Save' button to leave this page.";
@@ -24,9 +19,9 @@ window.onbeforeunload = function (event) {
   return message;
 };
 
-db.ref("FCCHATONLINE/online").on("value", (data) => {
-  $("#onlineCount").text(data.val() + 1);
-});
+firebase.initializeApp(config);
+let db = firebase.database();
+
 window.addEventListener("load", () => {
   //Bildirim desteği tarayıcıda var mı kontrol edeceğiz.
   if (!window.Notification) return;
@@ -65,7 +60,6 @@ const app = Vue.createApp({
       },
 
       getAllMessage: {},
-      userAllInfo: {},
     };
   },
 
@@ -74,12 +68,16 @@ const app = Vue.createApp({
     authLogin(processLogin) {
       if (processLogin == "Google") {
         const provider = new firebase.auth.GoogleAuthProvider();
-
         firebase
           .auth()
           .signInWithPopup(provider)
           .then(function (result) {
-            // code which runs on success
+            if (user) {
+              this.userInfo.displayName = user.displayName;
+              this.userInfo.userProfil = user.photoURL;
+              this.userInfo.userID = user.uid;
+              this.getAllMessageOnFirebase();
+            }
           })
           .catch(function (error) {
             Swal.fire("Google Hesabınıza Bağlanılamadı", "", "warning");
@@ -102,34 +100,19 @@ const app = Vue.createApp({
 
     //Kullanıcnın giriş ve çıkışlarını kontrol ederek Offline ve Online Etme Durumu
     onlineORoffline(useruid) {
-      db.ref("FCCHATONLINE").on("value", (data) => {
-        this.userAllInfo = data.val();
-      });
-
       //Kullanıcı Online Yap
       Object.assign(this.userInfo, { online: true });
       db.ref("FCCHATONLINE").child(useruid).set(this.userInfo);
 
-      db.ref("FCCHATONLINE/online").once("value", (data) => {
-        db.ref("FCCHATONLINE")
-          .child("online")
-          .set(data.val() + 1);
-      });
-
       //Kullanıcı Offline
+
       window.addEventListener("beforeunload", (event) => {
+        // Prevent the default behavior (prompting the user to confirm that they want to leave the page)
         event.preventDefault();
 
         // Add data to Firebase
         Object.assign(this.userInfo, { online: false });
         db.ref("FCCHATONLINE").child(useruid).set(this.userInfo);
-        db.ref("FCCHATONLINE/online").once("value", (data) => {
-          if (data.val() >= 0) {
-            db.ref("FCCHATONLINE")
-              .child("online")
-              .set(data.val() - 1);
-          }
-        });
       });
     },
 
@@ -139,30 +122,15 @@ const app = Vue.createApp({
       db.ref("FCCHAT/" + idKey)
         .child(this.userInfo.userID)
         .set(this.userChat);
-
+      Notification.requestPermission().then(sendNotifaciton(this.userInfo.displayName, this.userChat.userMessage, this.userInfo.userProfil));
       this.userChat.userMessage = "";
     },
 
     getAllMessageOnFirebase() {
-      let endUserMessageUserID = [];
-      db.ref("FCCHAT")
-        .orderByChild("timestamp")
-        .limitToLast(1)
-        .on("child_added", function (snapshot) {
-          // Son ekleyen kullanıcnın idsi :
-          endUserMessageUserID[0] = Object.keys(snapshot.val())[0];
-          endUserMessageUserID[1] = snapshot.val();
-        });
-
       db.ref("FCCHAT").on("value", (data) => {
         this.getAllMessage = data.val();
         console.log(this.getAllMessage);
-        setTimeout(() => {
-          if (this.userInfo.userID !== endUserMessageUserID[0]) {
-            console.log(endUserMessageUserID);
-            Notification.requestPermission().then(sendNotifaciton(this.userInfo.displayName, endUserMessageUserID[1].userMessage, this.userInfo.userProfil));
-          }
-
+        setInterval(() => {
           scrollDownEnd();
         }, 500);
       });
@@ -179,32 +147,15 @@ const app = Vue.createApp({
         this.userInfo.userID = user.uid;
         this.getAllMessageOnFirebase();
         this.onlineORoffline(user.uid);
-
-        //Deneme
-        /*
-        firebase
-          .auth()
-          .currentUser.sendEmailVerification()
-          .then(function () {
-            // Email verification sent!
-            console.log("Email verification sent!");
-          })
-          .catch(function (error) {
-            // An error happened.
-            console.error(error.message);
-          });
-          */
       } else {
         const provider = new firebase.auth.GoogleAuthProvider();
         firebase
           .auth()
           .signInWithPopup(provider)
-          .then(function (result) {
-            $("#myModal").modal("toggle");
-          })
+          .then(function (result) {})
           .catch(function (error) {
             $("#myModal").modal();
-            Swal.fire("Google Hesabınıza Bağlanırken Sorun Oluştu Lütfen Bağlanmaya Tekrar Çalışın", "VE YA BİR DİĞER ALTERNETİF OLARAK MAİL ADRESİNİ VE ŞİFRENİZİ GİREREEK SAĞLAYABİLİRSİNİZ VE YA GOOGLE HESABINIZ İÇİN KOLAY BİR YOLDAN GİRİŞ YAPMAK İÇİN TEKRAR 'GOOGLE İLE GİRİŞ YAP BUTTONUNA TIKLAYIP İŞLEMİNİZİ GERÇEKLEŞTİREBİLİRSİNİZ.' ", "warning");
+            Swal.fire("Google Hesabınıza Bağlanılamadı", "", "warning");
           });
       }
     });

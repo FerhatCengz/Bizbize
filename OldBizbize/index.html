@@ -20,16 +20,6 @@
         integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
 
     <link rel="stylesheet" href="/chatAsset/style.css">
-
-
-    <!-- Tag manager -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tagmanager/3.0.2/tagmanager.min.js"
-        integrity="sha512-HiJMeObPjMYvMcA0jvYKyRPFz75sq+YsOJb8HW+RxMiXgWQlgdLd5sNqb16LcyqLCiWNfNeh/QZoi9kzr4d6ng=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tagmanager/3.0.2/tagmanager.css"
-        integrity="sha512-jQG1E/4m1U5KloaLuKODuYwGFW8HC4MdH9E9IjkRDjqUuFD0RJ/InBSPCWkVx/K2pQD4kPcD12xXVWbNOmmivQ=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
 <body>
@@ -65,7 +55,8 @@
         <div class="card-header ui-sortable-handle">
             <h3 class="card-title">Sana Özel Mesaj ❤ </h3>
             <div class="card-tools">
-                Toplam Çevrimiçi: <span class="badge badge-primary"><b id="onlineCount"></b></span>
+                Toplam Çevrimiçi: <span class="badge badge-primary"><b
+                        id="onlineCount"></b></span>
                 <!--              
                 <button type="button" class="btn btn-tool" title="Contacts" data-widget="chat-pane-toggle">
                     <i class="fas fa-comments"></i>
@@ -83,7 +74,7 @@
                     <!-- Gelen Mesajlar -->
                     <div class="direct-chat-msg" v-if="Object.keys(message)[0] != userInfo.userID">
                         <div class="direct-chat-infos clearfix">
-                            <span class="direct-chat-name float-left">{{userAllInfo[Object.keys(message)[0]].displayName}}</span>
+                            <span class="direct-chat-name float-left">{{userInfo.displayName}}</span>
                             <span
                                 class="direct-chat-timestamp float-right">{{message[Object.keys(message)[0]].messageDate}}</span>
                         </div>
@@ -181,12 +172,11 @@
         crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.1/dist/js/adminlte.min.js"></script>
 
+    <script src="firebase/firebase-app.js"></script>
+    <script src="firebase/firebase-auth.js"></script>
+    <script src="firebase/firebase.js"></script>
 
-    <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase-database.js"></script>
-
-    <script src="app.js?v1.1.0"></script>
+    <script src="app.js"></script>
 
 
 </body>

@@ -1,0 +1,61 @@
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    console.log("user zaten mevcut =>", user);
+  } else {
+    console.log("böyle bir user yok giriş yap");
+    const phoneNumber = "+905426575124";
+    const appVerifier = window.recaptchaVerifier;
+
+    window.recaptchaVerifier = new RecaptchaVerifier(
+      "recaptcha-container",
+      {
+        size: "normal",
+        callback: (response) => {
+          console.log("callback response => ", response);
+        },
+        "expired-callback": (responseExpired) => {
+          // Response expired. Ask user to solve reCAPTCHA again.
+          console.log("responseExpired => ", responseExpired);
+        },
+      },
+      auth
+    );
+
+    $("#sign-in-button").click(function (e) {});
+  }
+});
+
+// recaptchaVerifier.render().then((widgetId = "recaptcha-container") => {
+//   window.recaptchaWidgetId = widgetId;
+//   const recaptchaResponse = grecaptcha.getResponse(recaptchaWidgetId);
+//   console.log("recaptcha render => ", recaptchaResponse);
+// });
+
+/*
+
+ signInWithPhoneNumber(auth, phoneNumber, appVerifier)
+        .then((confirmationResult) => {
+          // SMS sent. Prompt user to type the code from the message, then sign the
+          // user in with confirmationResult.confirm(code).
+
+          console.log("mesaj gönderildi => ", confirmationResult);
+          const code = prompt("Gelen Mesaj Kodunuz : ");
+          confirmationResult
+            .confirm(code)
+            .then((success) => {
+              console.log("auth success => ", success);
+            })
+            .catch((err) => {
+              console.log("err => ", err.message);
+            });
+
+          //   window.confirmationResult = confirmationResult;
+          // ...
+        })
+        .catch((error) => {
+          // Error; SMS not sent
+          // ...
+          console.log(error.message);
+        });
+*/

@@ -1,0 +1,97 @@
+
+
+
+//Kiracı kimliği
+
+//Recaptcha Doğrulaması
+const recaptchaVerifier = new RecaptchaVerifier(
+  "recaptcha-container",
+
+  // Optional reCAPTCHA parameters.
+  {
+    size: "normal",
+    callback: function (response) {
+      // reCAPTCHA solved, you can proceed with
+      // phoneAuthProvider.verifyPhoneNumber(...).
+      console.log("response => ", response);
+      onSolvedRecaptcha();
+    },
+    "expired-callback": function () {
+      // Response expired. Ask user to solve reCAPTCHA again.
+      // ...
+    },
+  },
+  auth
+);
+
+// $("#sign-in-button").click(function (e) {
+//   recaptchaVerifier.render().then(function (widgetId = "recaptcha-container") {
+//     window.recaptchaWidgetId = widgetId;
+//     // var recaptchaResponse = grecaptcha.getResponse(window.recaptchaWidgetId);
+//     // console.log(recaptchaResponse);
+//   });
+// });
+
+// signInWithEmailAndPassword(auth, "ferhat.cengiz13@outlook.com", "123456")
+//   .then((result) => {
+//     console.log(result);
+//   })
+//   .catch((err) => {
+//     console.log(err.message);
+//   });
+/*
+
+*/
+
+// onAuthStateChanged(auth, (user) => {
+//   if (user) {
+//     //İşlemler
+//     const tenantId = "TENANT_ID1";
+//     auth.tenantId = tenantId;
+//     console.log("tenantId => ", auth.tenantId);
+
+//   } else {
+//     console.log("user yok");
+//   }
+// });
+
+$("#sign-in-button").click(function (e) {
+  const email = "ferhat.cengiz13@outlook.com";
+  const password = "123456";
+
+  signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
+    // User is signed in.
+    const user = userCredential.user;
+
+    // Switch to 'TENANT_ID2'.
+    auth.tenantId = "TENANT_ID2";
+    multiFactor(user)
+      .getSession()
+      .then(function (multiFactorSession) {
+        const phoneInfoOptions = {
+          phoneNumber: "+905426575124",
+          session: multiFactorSession,
+        };
+        const phoneAuthProvider = new PhoneAuthProvider(auth);
+        phoneAuthProvider.verifyPhoneNumber(phoneInfoOptions, recaptchaVerifier).then(function (verificationId) {
+          // verificationId will be needed to complete enrollment.
+          console.log("end verifty => ", verificationId);
+        });
+      });
+
+    // user.tenantId is set to 'TENANT_ID1'.
+    // auth.currentUser still points to the user.
+    // auth.currentUser.tenantId is 'TENANT_ID1'.
+  });
+});
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    console.log("user mevcut");
+  }
+});
+
+
+
+
+
