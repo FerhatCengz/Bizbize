@@ -62,19 +62,23 @@ const app = Vue.createApp({
 
       getAllMessage: {},
       userAllInfo: {},
+      onlineUser: 0,
     };
   },
 
   methods: {
     userLogOut() {
       Object.assign(this.userInfo, { online: false, endWiew: new Date().toLocaleString() });
-      db.ref("FCCHATONLINE").child(useruid).set(this.userInfo);
-      db.ref("OnlineCount").once("value", (data) => {
-        if (data.val() >= 0) {
-          db.ref("OnlineCount").set(data.val() - 1);
-        }
+      db.ref("FCCHATONLINE").child(this.userInfo.userID).set(this.userInfo);
+
+      db.ref("FCCHATONLINE").once("value", (userData) => {
+        Object.keys(userData.val()).forEach((dataKeys) => {
+          if (!userData.val()[dataKeys].online) {
+            db.ref("OnlineCount").set(--this.onlineUser);
+          }
+        });
       });
-      
+
       firebase
         .auth()
         .signOut()
@@ -174,8 +178,12 @@ const app = Vue.createApp({
       Object.assign(this.userInfo, { online: true });
       db.ref("FCCHATONLINE").child(useruid).set(this.userInfo);
 
-      db.ref("OnlineCount").once("value", (data) => {
-        db.ref("OnlineCount").set(data.val() + 1);
+      db.ref("FCCHATONLINE").once("value", (userData) => {
+        Object.keys(userData.val()).forEach((dataKeys) => {
+          if (userData.val()[dataKeys].online) {
+            db.ref("OnlineCount").set(++this.onlineUser);
+          }
+        });
       });
 
       //Kullanıcı Offline
