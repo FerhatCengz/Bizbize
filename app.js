@@ -71,8 +71,13 @@ const app = Vue.createApp({
         .auth()
         .signOut()
         .then((result) => {
-          this.onlineORoffline();
-          window.location.reload();
+          Object.assign(this.userInfo, { online: false, endWiew: new Date().toLocaleString() });
+          db.ref("FCCHATONLINE").child(useruid).set(this.userInfo);
+          db.ref("OnlineCount").once("value", (data) => {
+            if (data.val() >= 0) {
+              db.ref("OnlineCount").set(data.val() - 1);
+            }
+          });
         })
         .catch((err) => {
           Swal.fire("Oturum Kapanamadı !", "", "error");
