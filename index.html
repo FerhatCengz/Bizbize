@@ -149,7 +149,8 @@
                                     {{infoOnline.displayName}}
                                     {{userInfo.userID == infoOnline.userID ? '( Siz )' : ""}}
                                     <small class="contacts-list-date float-right">
-                                        <i :class="infoOnline.online ? 'text-success' : 'text-danger'" class="fa-solid fa-globe"></i>
+                                        <i :class="infoOnline.online ? 'text-success' : 'text-danger'"
+                                            class="fa-solid fa-globe"></i>
                                     </small>
                                 </span>
                                 <span class="contacts-list-msg">
@@ -184,7 +185,7 @@
                     <i class="fa-solid fa-paperclip mt-2 mr-3" style="font-size: 19px; cursor: pointer;"
                         id="fileUpload"></i>
                     <input type="file" id="fileInput" class="d-none">
-                    <input  @keydown.enter="sendMessage" v-model="userChat.userMessage" type="text" name="message"
+                    <input @keydown.enter="sendMessage" v-model="userChat.userMessage" type="text" name="message"
                         placeholder="Mesaj Yazınız" class="form-control">
                     <span class="input-group-append">
                         <button type="button" class="btn btn-primary" @click="sendMessage">Gönder</button>

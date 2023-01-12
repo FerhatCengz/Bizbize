@@ -190,18 +190,28 @@ const app = Vue.createApp({
 
     fileSendButton() {
       const fileInputInfo = JSON.parse(localStorage.getItem("updateFilePath"));
-      const fileHTML = `
+      const fileType = JSON.parse(localStorage.getItem("updateFilePath")).fileInfo.fileType.split("/")[0];
+      let fileHTML = `
       <div id="fileTypeCard" class="card w-25 rounded">
              <a href="${fileInputInfo.fileURL}">
                  <div class="card-body bg-dark text-white rounded">
-                     <i id="fileTypeIcon" class="ml-3 mr-1 fa-solid fa-file"></i>
-                     <span id="fileType">
-                         <small class="mr-5 ml-2">${fileInputInfo.fileInfo.fileName}</small>
-                     </span>
+                 
+                 <i id="fileTypeIcon" class="ml-3 mr-1 fa-solid fa-file"></i>
+                 <span id="fileType">
+                     <small class="mr-5 ml-2">${fileInputInfo.fileInfo.fileName}</small>
+                 </span>
                  </div>
              </a>
       </div>
       `;
+
+      if (fileType === "image") {
+        fileHTML = `
+        <a href="${fileInputInfo.fileURL}">
+            <img src="${fileInputInfo.fileURL}" style='max-width: 600px; height:350px;'/>
+        </a>
+        `;
+      }
       Object.assign(this.userChat, { File: fileHTML, fileURL: fileInputInfo.fileURL });
       let idKey = db.ref().child("FCCHAT").push().key;
       db.ref("FCCHAT/" + idKey)
