@@ -153,7 +153,8 @@
                                     </small>
                                 </span>
                                 <span class="contacts-list-msg">
-                                    {{infoOnline.online === true ? "Çevrim İçi" : "Son Görülme : "+infoOnline.endWiew}}
+                                    {{infoOnline.online === true ? "Çevrim İçi" : "Son Görülme : "+ 
+                                    new Date(Number(infoOnline.endWithDate)).toLocaleString()}}
                                 </span>
                             </div>
 
@@ -218,7 +219,6 @@
 
     <script src="app.js"></script>
     <script type="module" src="media.js"></script>
-
 
 </body>
 

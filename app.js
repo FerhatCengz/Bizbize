@@ -68,16 +68,12 @@ const app = Vue.createApp({
 
   methods: {
     userLogOut() {
-      Object.assign(this.userInfo, { online: false, endWiew: new Date().toLocaleString() });
+      const logOutConClose = {
+        online: false,
+        endWithDate: firebase.database.ServerValue.TIMESTAMP,
+      };
+      Object.assign(this.userInfo, logOutConClose);
       db.ref("FCCHATONLINE").child(this.userInfo.userID).set(this.userInfo);
-
-      db.ref("FCCHATONLINE").once("value", (userData) => {
-        Object.keys(userData.val()).forEach((dataKeys) => {
-          if (!userData.val()[dataKeys].online) {
-            db.ref("OnlineCount").set(--this.onlineUser);
-          }
-        });
-      });
 
       firebase
         .auth()
@@ -175,31 +171,30 @@ const app = Vue.createApp({
       });
 
       //Kullanıcı Online Yap
-      Object.assign(this.userInfo, { online: true });
-      db.ref("FCCHATONLINE").child(useruid).set(this.userInfo);
+      const dataObject = {
+        online: true,
+        entryDate: new Date().toLocaleString(),
+      };
 
-      db.ref("FCCHATONLINE").once("value", (userData) => {
-        Object.keys(userData.val()).forEach((dataKeys) => {
-          if (userData.val()[dataKeys].online) {
-            db.ref("OnlineCount").set(++this.onlineUser);
-          }
-        });
-      });
+      var myConnectionsRef = firebase.database().ref("FCCHATONLINE/" + this.userInfo.userID);
+      var connectedRef = firebase.database().ref(".info/connected");
+      connectedRef.on("value", (snap) => {
+        if (snap.val() === true) {
+          //Veri yaz
+          Object.assign(this.userInfo, { online: true });
+          myConnectionsRef.set(this.userInfo);
 
-      //Kullanıcı Offline
+          // Bağlantı Koptuğunda Mevcut veriyi kaldırır
+          myConnectionsRef.onDisconnect().remove();
 
-      //! İPTAL ETTİM  BİLEREK
-      window.addEventListener("beforeunload", (event) => {
-        event.preventDefault();
-
-        // Add data to Firebase
-        Object.assign(this.userInfo, { online: false, endWiew: new Date().toLocaleString() });
-        db.ref("FCCHATONLINE").child(useruid).set(this.userInfo);
-        db.ref("OnlineCount").once("value", (data) => {
-          if (data.val() >= 0) {
-            db.ref("OnlineCount").set(data.val() - 1);
-          }
-        });
+          // Bağlantı Koptuğunda herhangi bir yere bir veri yazdırır.
+          const connClose = {
+            online: false,
+            endWithDate: firebase.database.ServerValue.TIMESTAMP,
+          };
+          Object.assign(this.userInfo, connClose);
+          myConnectionsRef.onDisconnect().set(this.userInfo);
+        }
       });
     },
 
@@ -250,6 +245,7 @@ const app = Vue.createApp({
       $("#fileSend").hide(500);
       $("#proggcessContainer").hide();
     },
+
     getAllMessageOnFirebase() {
       let endUserMessageUserID = [];
       db.ref("FCCHAT")
@@ -277,7 +273,7 @@ const app = Vue.createApp({
   },
   mounted() {
     // Gooogle İle Giriş
-    //Önce Google hesabı ile auth edilmiş mi yoksa edilmemiş mi diye kontrol edeceğiz :
+    // Önce Google hesabı ile auth edilmiş mi yoksa edilmemiş mi diye kontrol edeceğiz :
 
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
@@ -286,25 +282,6 @@ const app = Vue.createApp({
         this.userInfo.userID = user.uid;
         this.getAllMessageOnFirebase();
         this.onlineORoffline(user.uid);
-
-        //Online Olan kişilerinin sayısını yazacğız
-        db.ref("OnlineCount").on("value", (data) => {
-          $("#onlineCount").text(data.val());
-        });
-        //Deneme
-        /*
-        firebase
-          .auth()
-          .currentUser.sendEmailVerification()
-          .then(function () {
-            // Email verification sent!
-            console.log("Email verification sent!");
-          })
-          .catch(function (error) {
-            // An error happened.
-            console.error(error.message);
-          });
-          */
       } else {
         const provider = new firebase.auth.GoogleAuthProvider();
         firebase
