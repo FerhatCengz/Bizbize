@@ -19,7 +19,7 @@ const storage = getStorage(app);
 
 $(document).ready(function () {
   $("#proggcessContainer").hide();
-  // $("#folderGear").hide();
+
   $("#fileSend").hide();
 
   $("#fileUpload").click(function (e) {
@@ -29,18 +29,17 @@ $(document).ready(function () {
     $("#fileSend").hide();
 
     $("input[type=file]").change(function (e) {
-      console.log("fileInput => ", fileInput.files[0].size);
-      if (fileInput.files[0].size <= 4000000) {
-        $("#proggcessContainer").show(500);
-        const files = fileInput.files[0];
-        const storageRef = ref(storage, "FCCHAT_FOLDER/" + new Date().getTime() + "_" + files.name);
-        const uploadTask = uploadBytesResumable(storageRef, files);
+      $("#proggcessContainer").show(500);
+      const files = fileInput.files[0];
+      const storageRef = ref(storage, "FCCHAT_FOLDER/" + new Date().getTime() + "_" + files.name);
+      const uploadTask = uploadBytesResumable(storageRef, files);
 
-        uploadTask.on("state_changed", (snapshot) => {
-          console.log("snapshot => ", snapshot);
-          var progress = Math.floor((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-          document.getElementById("proggcessLoad").style = `width: ${progress}%`;
-          if (progress == 100) {
+      uploadTask.on("state_changed", (snapshot) => {
+        console.log("snapshot => ", snapshot);
+        var progress = Math.floor((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+        document.getElementById("proggcessLoad").style = `width: ${progress}%`;
+        if (progress == 100) {
+          setTimeout(() => {
             getDownloadURL(storageRef)
               .then((result) => {
                 console.log("files => ", files.name, files.type);
@@ -54,23 +53,20 @@ $(document).ready(function () {
                     },
                   })
                 );
-
                 $("#fileSend").show(500);
               })
               .catch((err) => {
-                // $("#folderGear").show(500);
+                Swal.fire("Dosya Yüklerken Bir Hata Oluştu", "Lütfen Dosyanın Bozuk Olmadığınından Emin Olun", "info");
               });
-          }
-        });
+          }, 1500);
+        }
+      });
 
-        $("#fileCancel").click((e) => {
-          uploadTask.cancel();
-          document.getElementById("proggcessLoad").style = `width:0%`;
-          $("#proggcessContainer").hide(500);
-        });
-      } else {
-        Swal.fire("Dosyanızı Küçültmeniz Gerek", "MAX : 4 MB", "warning");
-      }
+      $("#fileCancel").click((e) => {
+        uploadTask.cancel();
+        document.getElementById("proggcessLoad").style = `width:0%`;
+        $("#proggcessContainer").hide(500);
+      });
     });
   });
 });

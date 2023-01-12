@@ -78,13 +78,16 @@
             <h3 class="card-title">Sana Özel Mesaj ❤ </h3>
             <div class="card-tools">
                 Toplam Çevrimiçi: <span class="badge badge-primary"><b id="onlineCount"></b></span>
-                <!--              
-                <button type="button" class="btn btn-tool" title="Contacts" data-widget="chat-pane-toggle">
-                    <i class="fas fa-comments"></i>
-                </button> -->
+
+                <button type="button" class="btn btn-tool">
+                    <i class="fa-solid fa-solid fa-gear" id="idProfileSetting" @click="profileSetting"></i>
+                </button>
+                <button type="button" class="btn btn-tool" data-widget="chat-pane-toggle">
+                    <i class="fa-solid fa-user-group"></i>
+                </button>
                 <!-- <button type="button" class="btn btn-tool" data-card-widget="remove">
                     <i class="fas fa-times"></i>
-                </button> -->
+                </button>  -->
             </div>
         </div>
 
@@ -97,26 +100,24 @@
                     <div class="direct-chat-msg" v-if="Object.keys(message)[0] != userInfo.userID">
                         <div class="direct-chat-infos clearfix">
                             <span
-                                class="direct-chat-name float-left">{{userAllInfo[Object.keys(message)[0]].displayName}}</span>
-                            <span
                                 class="direct-chat-timestamp float-right">{{message[Object.keys(message)[0]].messageDate}}</span>
                         </div>
-
                         <img class="direct-chat-img" :src="userAllInfo[Object.keys(message)[0]].userProfil"
                             alt="message user image">
 
                         <div class="direct-chat-text">
+
                             <div v-html="message[Object.keys(message)[0]].File">
 
                             </div>
-                            {{message[userInfo.userID].userMessage}}
+                            {{message[Object.keys(message)[0]].userMessage }}
+
                         </div>
                     </div>
 
                     <!-- Giden Mesajlar -->
                     <div class="direct-chat-msg right" v-else>
                         <div class=" direct-chat-infos clearfix">
-                            <span class="direct-chat-name float-right">{{userInfo.displayName}}</span>
                             <span
                                 class="direct-chat-timestamp float-left">{{message[Object.keys(message)[0]].messageDate}}</span>
                         </div>
@@ -134,40 +135,33 @@
                 </div>
             </div>
 
-            <!-- 
-            <div class="direct-chat-contacts">
-                <ul class="contacts-list">
+
+            <!-- Şuan ki çevrim içi olan kişilerin hepsini göster -->
+            <!-- { "displayName": "Ferhat Cengiz", "online": true, "userID": "sz8n5xLH9zUBiv081vUUmhfKvwL2", "userProfil": "https://avatars.githubusercontent.com/u/79553498?v=4" } -->
+            <div class="direct-chat-contacts" style="height: 95vh;">
+
+                <ul class="contacts-list" v-for="infoOnline in userAllInfo" :key="infoOnline">
                     <li>
                         <a href="#">
-                            <img class="contacts-list-img" src="dist/img/user1-128x128.jpg" alt="User Avatar">
+                            <img class="contacts-list-img" :src="infoOnline.userProfil" alt="User Avatar">
                             <div class="contacts-list-info">
                                 <span class="contacts-list-name">
-                                    Count Dracula
-                                    <small class="contacts-list-date float-right">2/28/2015</small>
+                                    {{infoOnline.displayName}}
+                                    {{userInfo.userID == infoOnline.userID ? '( Siz )' : ""}}
+                                    <small class="contacts-list-date float-right">
+                                        <i :class="infoOnline.online ? 'text-success' : 'text-danger'" class="fa-solid fa-globe"></i>
+                                    </small>
                                 </span>
-                                <span class="contacts-list-msg">How have you been? I was...</span>
+                                <span class="contacts-list-msg">
+                                    {{infoOnline.online === true ? "Çevrim İçi" : "Son Görülme : "+infoOnline.endWiew}}
+                                </span>
                             </div>
 
                         </a>
                     </li>
-
-                    <li>
-                        <a href="#">
-                            <img class="contacts-list-img" src="dist/img/user7-128x128.jpg" alt="User Avatar">
-                            <div class="contacts-list-info">
-                                <span class="contacts-list-name">
-                                    Sarah Doe
-                                    <small class="contacts-list-date float-right">2/23/2015</small>
-                                </span>
-                                <span class="contacts-list-msg">I will be waiting for...</span>
-                            </div>
-
-                        </a>
-                    </li>
-
                 </ul>
 
-            </div> -->
+            </div>
 
         </div>
         <div class="card-footer">
@@ -176,12 +170,9 @@
                     <i class="fa-solid fa-xmark btn btn-sm text-danger" id="fileCancel"></i>
                     <i class="fa-solid fa-circle-arrow-up btn btn-sm text-success" id="fileSend"
                         @click="fileSendButton"><small class="ml-2 mr-2">DOSYAYI GÖNDER (MESAJINIZ İLE BİRLİKTE
-                            GİDECEKTİR)</small></i>
-                    <!-- <i class="fa-solid fa-gear ml-2 mr-2 btn btn-sm text-warning" id="folderGear"><small
-                            class="ml-2">Dosyayı Onarmalısınız</small></i> -->
+                            GİDEBİLİR)</small></i>
 
                 </div>
-
                 <div class="progress">
                     <div class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 0%"
                         id="proggcessLoad" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
@@ -221,6 +212,7 @@
     <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase.js"></script>
     <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase-storage.js"></script>
 
     <script src="app.js"></script>
     <script type="module" src="media.js"></script>

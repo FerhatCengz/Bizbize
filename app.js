@@ -23,9 +23,6 @@ window.onbeforeunload = function (event) {
 };
 */
 
-db.ref("FCCHATONLINE/online").on("value", (data) => {
-  $("#onlineCount").text(data.val() + 1);
-});
 window.addEventListener("load", () => {
   //Bildirim desteği tarayıcıda var mı kontrol edeceğiz.
   if (!window.Notification) return;
@@ -99,6 +96,55 @@ const app = Vue.createApp({
       }
     },
 
+    //Profili güncelle
+    profileSetting() {
+      Swal.fire({
+        title: "Sweet!",
+        text: "Modal with a custom image.",
+        imageUrl: this.userInfo.userProfil,
+        imageAlt: "Custom image",
+        html: `
+          <input type="file" class="form-control" id="userFileProfile"/>
+          <script>
+            alert();
+          </script>
+        `,
+        confirmButtonText: "Fotoğrafı Kaydet",
+        preConfirm: () => {
+          //Kodla :
+          const ref = firebase.storage().ref();
+          const file = document.getElementById("userFileProfile").files[0];
+          const fileName = this.userInfo.userID + "-" + file.name;
+          const metaData = {
+            contentType: file.type,
+          };
+          const task = ref.child(fileName + "/" + fileName).put(file, metaData);
+          task.then((snapshot) =>
+            snapshot.ref
+              .getDownloadURL()
+              .then((downloadURL) => {
+                const user = firebase.auth().currentUser;
+
+                user
+                  .updateProfile({
+                    photoURL: downloadURL,
+                  })
+                  .then(() => {
+                    Swal.fire("Profiliniz Güncellendi !", "", "success");
+                    this.userAllInfo[this.userInfo.userID].userProfil = downloadURL;
+                    this.userInfo.userProfil = downloadURL;
+                    db.ref("FCCHATONLINE").child(this.userInfo.userID).set(this.userAllInfo[this.userInfo.userID]);
+                  })
+                  .catch((error) => {
+                    Swal.fire("Profile Güncellenirken Bir Hata Oluştu !", "", "warning");
+                  });
+              })
+              .catch((err) => {})
+          );
+        },
+      });
+    },
+
     //Kullanıcnın giriş ve çıkışlarını kontrol ederek Offline ve Online Etme Durumu
     onlineORoffline(useruid) {
       db.ref("FCCHATONLINE").on("value", (data) => {
@@ -109,25 +155,22 @@ const app = Vue.createApp({
       Object.assign(this.userInfo, { online: true });
       db.ref("FCCHATONLINE").child(useruid).set(this.userInfo);
 
-      db.ref("FCCHATONLINE/online").once("value", (data) => {
-        db.ref("FCCHATONLINE")
-          .child("online")
-          .set(data.val() + 1);
+      db.ref("OnlineCount").once("value", (data) => {
+        db.ref("OnlineCount").set(data.val() + 1);
       });
 
       //Kullanıcı Offline
-      
+
+      //! İPTAL ETTİM  BİLEREK
       window.addEventListener("beforeunload", (event) => {
         event.preventDefault();
 
         // Add data to Firebase
-        Object.assign(this.userInfo, { online: false });
+        Object.assign(this.userInfo, { online: false, endWiew: new Date().toLocaleString() });
         db.ref("FCCHATONLINE").child(useruid).set(this.userInfo);
-        db.ref("FCCHATONLINE/online").once("value", (data) => {
+        db.ref("OnlineCount").once("value", (data) => {
           if (data.val() >= 0) {
-            db.ref("FCCHATONLINE")
-              .child("online")
-              .set(data.val() - 1);
+            db.ref("OnlineCount").set(data.val() - 1);
           }
         });
       });
@@ -207,6 +250,12 @@ const app = Vue.createApp({
         this.getAllMessageOnFirebase();
         this.onlineORoffline(user.uid);
 
+        //Online Olan kişilerinin sayısını yazacğız
+        db.ref("OnlineCount").on("value", (data) => {
+          $("#onlineCount").text(data.val());
+        });
+        //Deneme
+        /*
         firebase
           .auth()
           .currentUser.sendEmailVerification()
@@ -218,6 +267,7 @@ const app = Vue.createApp({
             // An error happened.
             console.error(error.message);
           });
+          */
       } else {
         const provider = new firebase.auth.GoogleAuthProvider();
         firebase
