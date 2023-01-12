@@ -66,6 +66,18 @@ const app = Vue.createApp({
   },
 
   methods: {
+    userLogOut() {
+      firebase
+        .auth()
+        .signOut()
+        .then((result) => {
+          this.onlineORoffline();
+          window.location.reload();
+        })
+        .catch((err) => {
+          Swal.fire("Oturum Kapanamadı !", "", "error");
+        });
+    },
     //Giriş Yap
     authLogin(processLogin) {
       if (processLogin == "Google") {
