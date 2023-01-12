@@ -67,17 +67,19 @@ const app = Vue.createApp({
 
   methods: {
     userLogOut() {
+      Object.assign(this.userInfo, { online: false, endWiew: new Date().toLocaleString() });
+      db.ref("FCCHATONLINE").child(useruid).set(this.userInfo);
+      db.ref("OnlineCount").once("value", (data) => {
+        if (data.val() >= 0) {
+          db.ref("OnlineCount").set(data.val() - 1);
+        }
+      });
+      
       firebase
         .auth()
         .signOut()
         .then((result) => {
-          Object.assign(this.userInfo, { online: false, endWiew: new Date().toLocaleString() });
-          db.ref("FCCHATONLINE").child(useruid).set(this.userInfo);
-          db.ref("OnlineCount").once("value", (data) => {
-            if (data.val() >= 0) {
-              db.ref("OnlineCount").set(data.val() - 1);
-            }
-          });
+          Swal.fire("Oturum Kapatıldı", "", "success");
         })
         .catch((err) => {
           Swal.fire("Oturum Kapanamadı !", "", "error");
