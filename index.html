@@ -18,7 +18,9 @@
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
         integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
+        integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="/chatAsset/style.css">
 
 
@@ -30,12 +32,22 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tagmanager/3.0.2/tagmanager.css"
         integrity="sha512-jQG1E/4m1U5KloaLuKODuYwGFW8HC4MdH9E9IjkRDjqUuFD0RJ/InBSPCWkVx/K2pQD4kPcD12xXVWbNOmmivQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        .direct-chat-primary .right>.direct-chat-text {
+            background-color: #76d47c;
+            border-color: #76d47c;
+            color: #fff;
+        }
+
+        .direct-chat-primary .right>.direct-chat-text::after,
+        .direct-chat-primary .right>.direct-chat-text::before {
+            border-left-color: #76d47c;
+        }
+    </style>
 </head>
 
 <body>
     <div class="card direct-chat direct-chat-primary" id="chatApp">
-
-
         <div class="modal fade" id="myModal" data-backdrop="static" data-keyboard="false" tabindex="-1"
             aria-labelledby="myModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -79,11 +91,13 @@
         <div class="card-body">
             <div class="direct-chat-messages" style="height: 80vh;" id="messageBody">
                 <div v-for="message in getAllMessage" :key="message">
+
                     <!-- message : {{message[userInfo.userID]}} -->
                     <!-- Gelen Mesajlar -->
                     <div class="direct-chat-msg" v-if="Object.keys(message)[0] != userInfo.userID">
                         <div class="direct-chat-infos clearfix">
-                            <span class="direct-chat-name float-left">{{userAllInfo[Object.keys(message)[0]].displayName}}</span>
+                            <span
+                                class="direct-chat-name float-left">{{userAllInfo[Object.keys(message)[0]].displayName}}</span>
                             <span
                                 class="direct-chat-timestamp float-right">{{message[Object.keys(message)[0]].messageDate}}</span>
                         </div>
@@ -92,9 +106,11 @@
                             alt="message user image">
 
                         <div class="direct-chat-text">
-                            {{message[Object.keys(message)[0]].userMessage}}
-                        </div>
+                            <div v-html="message[Object.keys(message)[0]].File">
 
+                            </div>
+                            {{message[userInfo.userID].userMessage}}
+                        </div>
                     </div>
 
                     <!-- Giden Mesajlar -->
@@ -108,6 +124,9 @@
                         <img class="direct-chat-img" :src="userInfo.userProfil" alt="message user image">
 
                         <div class="direct-chat-text">
+                            <div v-html="message[Object.keys(message)[0]].File">
+
+                            </div>
                             {{message[userInfo.userID].userMessage}}
                         </div>
 
@@ -146,17 +165,34 @@
                         </a>
                     </li>
 
-                  
-
                 </ul>
 
             </div> -->
 
         </div>
-
         <div class="card-footer">
+            <div class="container w-25 mt-2 mb-2" id="proggcessContainer">
+                <div class="d-flex justify-content-around">
+                    <i class="fa-solid fa-xmark btn btn-sm text-danger" id="fileCancel"></i>
+                    <i class="fa-solid fa-circle-arrow-up btn btn-sm text-success" id="fileSend"
+                        @click="fileSendButton"><small class="ml-2 mr-2">DOSYAYI GÖNDER (MESAJINIZ İLE BİRLİKTE
+                            GİDECEKTİR)</small></i>
+                    <!-- <i class="fa-solid fa-gear ml-2 mr-2 btn btn-sm text-warning" id="folderGear"><small
+                            class="ml-2">Dosyayı Onarmalısınız</small></i> -->
+
+                </div>
+
+                <div class="progress">
+                    <div class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 0%"
+                        id="proggcessLoad" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+
+            </div>
             <div>
                 <div class="input-group">
+                    <i class="fa-solid fa-paperclip mt-2 mr-3" style="font-size: 19px; cursor: pointer;"
+                        id="fileUpload"></i>
+                    <input type="file" id="fileInput" class="d-none">
                     <input @keydown.enter="sendMessage" v-model="userChat.userMessage" type="text" name="message"
                         placeholder="Mesaj Yazınız" class="form-control">
                     <span class="input-group-append">
@@ -186,7 +222,8 @@
     <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase-database.js"></script>
 
-    <script src="app.js?v1.1.0"></script>
+    <script src="app.js"></script>
+    <script type="module" src="media.js"></script>
 
 
 </body>

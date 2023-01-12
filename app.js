@@ -10,9 +10,7 @@ var config = {
 firebase.initializeApp(config);
 let db = firebase.database();
 
-console.log("firebase => ", firebase);
-///Kod:
-
+/*
 window.onbeforeunload = function (event) {
   var message = "Important: Please click on 'Save' button to leave this page.";
   if (typeof event == "undefined") {
@@ -23,6 +21,7 @@ window.onbeforeunload = function (event) {
   }
   return message;
 };
+*/
 
 db.ref("FCCHATONLINE/online").on("value", (data) => {
   $("#onlineCount").text(data.val() + 1);
@@ -117,6 +116,7 @@ const app = Vue.createApp({
       });
 
       //Kullanıcı Offline
+      
       window.addEventListener("beforeunload", (event) => {
         event.preventDefault();
 
@@ -135,6 +135,8 @@ const app = Vue.createApp({
 
     //Giriş Yapan Kullanıcının Mesaj Gönderim İşlemini Sağlayan Bir Fonksiyon
     sendMessage() {
+      this.userChat.File = "";
+      this.userChat.fileURL = "";
       let idKey = db.ref().child("FCCHAT").push().key;
       db.ref("FCCHAT/" + idKey)
         .child(this.userInfo.userID)
@@ -143,6 +145,31 @@ const app = Vue.createApp({
       this.userChat.userMessage = "";
     },
 
+    fileSendButton() {
+      const fileInputInfo = JSON.parse(localStorage.getItem("updateFilePath"));
+      const fileHTML = `
+      <div id="fileTypeCard" class="card w-25 rounded">
+             <a href="${fileInputInfo.fileURL}">
+                 <div class="card-body bg-dark text-white rounded">
+                     <i id="fileTypeIcon" class="ml-3 mr-1 fa-solid fa-file"></i>
+                     <span id="fileType">
+                         <small class="mr-5 ml-2">${fileInputInfo.fileInfo.fileName}</small>
+                     </span>
+                 </div>
+             </a>
+      </div>
+      `;
+      Object.assign(this.userChat, { File: fileHTML, fileURL: fileInputInfo.fileURL });
+      let idKey = db.ref().child("FCCHAT").push().key;
+      db.ref("FCCHAT/" + idKey)
+        .child(this.userInfo.userID)
+        .set(this.userChat);
+
+      this.userChat.userMessage = "";
+      localStorage.removeItem("updateFilePath");
+      $("#fileSend").hide(500);
+      $("#proggcessContainer").hide();
+    },
     getAllMessageOnFirebase() {
       let endUserMessageUserID = [];
       db.ref("FCCHAT")
@@ -180,8 +207,6 @@ const app = Vue.createApp({
         this.getAllMessageOnFirebase();
         this.onlineORoffline(user.uid);
 
-        //Deneme
-        /*
         firebase
           .auth()
           .currentUser.sendEmailVerification()
@@ -193,7 +218,6 @@ const app = Vue.createApp({
             // An error happened.
             console.error(error.message);
           });
-          */
       } else {
         const provider = new firebase.auth.GoogleAuthProvider();
         firebase
