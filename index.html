@@ -75,9 +75,9 @@
         </div>
 
         <div class="card-header ui-sortable-handle">
-            <h3 class="card-title">Sana Özel Mesaj ❤ </h3>
+            <h3 class="card-title">TOPLANTI ODASI 1</h3>
             <div class="card-tools">
-                Toplam Çevrimiçi: <span class="badge badge-primary"><b id="onlineCount"></b></span>
+                Toplam Çevrimiçi: <span class="badge badge-primary"><b>{{onlieUserCount}}</b></span>
 
                 <button type="button" class="btn btn-tool">
                     <i class="fa-solid fa-solid fa-gear" id="idProfileSetting" @click="profileSetting"></i>
@@ -138,7 +138,7 @@
             <!-- Şuan ki çevrim içi olan kişilerin hepsini göster -->
             <!-- { "displayName": "Ferhat Cengiz", "online": true, "userID": "sz8n5xLH9zUBiv081vUUmhfKvwL2", "userProfil": "https://avatars.githubusercontent.com/u/79553498?v=4" } -->
             <div class="direct-chat-contacts" style="height: 85vh;">
-
+                
                 <ul class="contacts-list" v-for="infoOnline in userAllInfo" :key="infoOnline">
                     <li>
                         <a href="#">

@@ -62,7 +62,7 @@ const app = Vue.createApp({
 
       getAllMessage: {},
       userAllInfo: {},
-      onlineUser: 0,
+      onlieUserCount: 0,
     };
   },
 
@@ -165,26 +165,25 @@ const app = Vue.createApp({
     },
 
     //Kullanıcnın giriş ve çıkışlarını kontrol ederek Offline ve Online Etme Durumu
-    onlineORoffline(useruid) {
+    onlineORoffline() {
       db.ref("FCCHATONLINE").on("value", (data) => {
         this.userAllInfo = data.val();
       });
 
       //Kullanıcı Online Yap
-      const dataObject = {
-        online: true,
-        entryDate: new Date().toLocaleString(),
-      };
 
       var myConnectionsRef = firebase.database().ref("FCCHATONLINE/" + this.userInfo.userID);
+      let onlineCountUserFirebaseRef = db.ref("OnlineCountUser/" + this.userInfo.userID);
+
       var connectedRef = firebase.database().ref(".info/connected");
       connectedRef.on("value", (snap) => {
         if (snap.val() === true) {
           //Veri yaz
           Object.assign(this.userInfo, { online: true });
           myConnectionsRef.set(this.userInfo);
+          onlineCountUserFirebaseRef.push("Çevirim İçi");
 
-          // Bağlantı Koptuğunda Mevcut veriyi kaldırır
+          //! Bağlantı Koptuğunda Mevcut veriyi kaldırır
           myConnectionsRef.onDisconnect().remove();
 
           // Bağlantı Koptuğunda herhangi bir yere bir veri yazdırır.
@@ -192,9 +191,16 @@ const app = Vue.createApp({
             online: false,
             endWithDate: firebase.database.ServerValue.TIMESTAMP,
           };
+          //?Son görülme sayısını güncelleyeceksin
           Object.assign(this.userInfo, connClose);
           myConnectionsRef.onDisconnect().set(this.userInfo);
+          onlineCountUserFirebaseRef.onDisconnect().remove();
         }
+      });
+
+      //Kaç kişi aktif yansıt
+      db.ref("OnlineCountUser").on("value", (data) => {
+        this.onlieUserCount = Object.keys(data.val()).length;
       });
     },
 
@@ -262,7 +268,8 @@ const app = Vue.createApp({
         console.log(this.getAllMessage);
         setTimeout(() => {
           if (this.userInfo.userID !== endUserMessageUserID[0]) {
-            console.log(endUserMessageUserID);
+            //Mesaj Göster
+            // console.log(endUserMessageUserID);
             Notification.requestPermission().then(sendNotifaciton(this.userInfo.displayName, endUserMessageUserID[1].userMessage, this.userInfo.userProfil));
           }
 
@@ -271,7 +278,10 @@ const app = Vue.createApp({
       });
     },
   },
+
   mounted() {
+    //Kaç kişi aktif
+
     // Gooogle İle Giriş
     // Önce Google hesabı ile auth edilmiş mi yoksa edilmemiş mi diye kontrol edeceğiz :
 
@@ -281,7 +291,7 @@ const app = Vue.createApp({
         this.userInfo.userProfil = user.photoURL || "https://cdn-icons-png.flaticon.com/512/16/16363.png?w=740&t=st=1673143475~exp=1673144075~hmac=e44e04eee15eb4e95a601fe644aa8a82b4e52fa45c600b430be3a6a31721eb14";
         this.userInfo.userID = user.uid;
         this.getAllMessageOnFirebase();
-        this.onlineORoffline(user.uid);
+        this.onlineORoffline();
       } else {
         const provider = new firebase.auth.GoogleAuthProvider();
         firebase
