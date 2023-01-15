@@ -138,7 +138,7 @@
             <!-- Şuan ki çevrim içi olan kişilerin hepsini göster -->
             <!-- { "displayName": "Ferhat Cengiz", "online": true, "userID": "sz8n5xLH9zUBiv081vUUmhfKvwL2", "userProfil": "https://avatars.githubusercontent.com/u/79553498?v=4" } -->
             <div class="direct-chat-contacts" style="height: 85vh;">
-                
+
                 <ul class="contacts-list" v-for="infoOnline in userAllInfo" :key="infoOnline">
                     <li>
                         <a href="#">
@@ -153,7 +153,7 @@
                                     </small>
                                 </span>
                                 <span class="contacts-list-msg">
-                                    {{infoOnline.online === true ? "Çevrim İçi" : "Son Görülme : "+ 
+                                    {{infoOnline.online === true ? "Çevrim İçi" : "Son Görülme : "+
                                     new Date(Number(infoOnline.endWithDate)).toLocaleString()}}
                                 </span>
                             </div>
@@ -183,20 +183,55 @@
 
             </div>
             <div>
+
                 <div class="input-group">
+
+                    <div id="controls" class="d-none m-auto">
+
+                        <div class="d-flex justify-content-around">
+                            <button class="fa-solid fa-microphone-lines btn btn-primary" id="recordButton"></button>
+
+                            <button class="fa-regular fa-circle-pause btn btn-warning text-white" id="pauseButton"
+                                disabled></button>
+                            <button class="fa-regular fa-circle-stop btn btn-danger" id="stopButton" disabled></button>
+                            <div id="recordingsList"></div>
+                           
+                            <i class="btn btn-success fa-solid fa-circle-arrow-up d-none" id="btnVoiceSend"></i>
+
+                        </div>
+                    </div>
+
+
                     <i class="fa-solid fa-paperclip mt-2 mr-3" style="font-size: 19px; cursor: pointer;"
                         id="fileUpload"></i>
                     <input type="file" id="fileInput" class="d-none">
-                    <input @keydown.enter="sendMessage" v-model="userChat.userMessage" type="text" name="message"
-                        placeholder="Mesaj Yazınız" class="form-control">
-                    <span class="input-group-append">
-                        <button type="button" class="btn btn-primary" @click="sendMessage">Gönder</button>
+                    <input id="messageText" @keydown.enter="sendMessage" v-model="userChat.userMessage" type="text"
+                        name="message" placeholder="Mesaj Yazınız" class="form-control">
+
+                    <span class="input-group-append m-auto">
+                        <!-- Mikrofon Ayar Controller -->
+                        <div class="d-flex justify-content-center">
+                            <div id="voiceRecord_display" class="display"></div>
+                            <div id="voiceRecord_controllers" class="controllers">
+                            </div>
+                        </div>
+                        <!-- Mikrofon Ayar Controller -->
+
+
+
+
+                        <button id="voiceStart" onclick="" class="fa-solid fa-microphone btn btn-info"></button>
+                        <button id="sendButton" type="button" class="btn btn-primary"
+                            @click="sendMessage">Gönder</button>
                     </span>
                 </div>
             </div>
         </div>
 
     </div>
+
+
+
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.4.29/sweetalert2.min.js"
         integrity="sha512-gCB2+0sWe4La5U90EqaPP2t58EczKkQE9UoCpnkG2EDSOOihgX/6MiT3MC4jYVEX03pv6Ydk1xybLG/AtN+3KQ=="
@@ -219,6 +254,8 @@
 
     <script src="app.js"></script>
     <script type="module" src="media.js"></script>
+    <script src="recorder.js"></script>
+    <script src="voice-recorder.js"></script>
 
 </body>
 
