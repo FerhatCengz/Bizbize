@@ -118,32 +118,40 @@ const app = Vue.createApp({
     //Profili güncelle
     profileSetting() {
       Swal.fire({
-        title: "Sweet!",
+        title: "Profil Fotoğrafını Değiştir",
         text: "Modal with a custom image.",
         imageUrl: this.userInfo.userProfil,
-        imageAlt: "Custom image",
         html: `
-          <input type="file" class="form-control" id="userFileProfile"/>
-          <script>
-            alert();
-          </script>
+        <p id='percent'></p>
+        <input type="file" class="form-control" id="userFileProfile" accept="image/*"/>
+
         `,
         confirmButtonText: "Fotoğrafı Kaydet",
         preConfirm: () => {
           //Kodla :
           const ref = firebase.storage().ref();
           const file = document.getElementById("userFileProfile").files[0];
-          const fileName = this.userInfo.userID + "-" + file.name;
           const metaData = {
             contentType: file.type,
           };
-          const task = ref.child(fileName + "/" + fileName).put(file, metaData);
-          task.then((snapshot) =>
-            snapshot.ref
-              .getDownloadURL()
-              .then((downloadURL) => {
-                const user = firebase.auth().currentUser;
 
+          var uploadTask = ref.child("FCUSERPROFILE/" + file.name + "_" + new Date().getTime()).put(file, metaData);
+
+          uploadTask.on(
+            firebase.storage.TaskEvent.STATE_CHANGED,
+            (snapshot) => {
+              var progress = Math.floor((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+              console.log(progress);
+              $("#percent").text(progress + " %");
+            },
+            (error) => {
+              console.log(error.message);
+            },
+            () => {
+              uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                const user = firebase.auth().currentUser;
+                
+                $("#percent").text("");
                 user
                   .updateProfile({
                     photoURL: downloadURL,
@@ -155,10 +163,11 @@ const app = Vue.createApp({
                     db.ref("FCCHATONLINE").child(this.userInfo.userID).set(this.userAllInfo[this.userInfo.userID]);
                   })
                   .catch((error) => {
+                    console.log(error.message);
                     Swal.fire("Profile Güncellenirken Bir Hata Oluştu !", "", "warning");
                   });
-              })
-              .catch((err) => {})
+              });
+            }
           );
         },
       });
