@@ -30,7 +30,6 @@ $(document).ready(function () {
 
     $("input[type=file]").change(function (e) {
       $("#proggcessContainer").show(500);
-
       const files = fileInput.files[0];
       var metadata = {
         contentType: files.type,
@@ -39,25 +38,17 @@ $(document).ready(function () {
       const storageRef = ref(storage, "FCCHAT_FOLDER/" + new Date().getTime() + "_" + files.name);
       const uploadTask = uploadBytesResumable(storageRef, files, metadata);
       uploadTask.on(
-        "state_changed",
+        firebase.storage.TaskEvent.STATE_CHANGED,
         (snapshot) => {
           var progress = Math.floor((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
           document.getElementById("proggcessLoad").style = `width: ${progress}%`;
-
-          switch (snapshot.state) {
-            case "cancel":
-              console.log("Upload is cancel");
-              break;
-            default:
-              console.log("default");
-              break;
-          }
         },
         (error) => {
           console.log("error.code =>", error.code);
         },
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            console.log(downloadURL);
             $("#fileSend").show(500);
             localStorage.setItem(
               "updateFilePath",

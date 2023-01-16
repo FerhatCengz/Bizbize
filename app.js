@@ -239,7 +239,14 @@ const app = Vue.createApp({
             <img src="${fileInputInfo.fileURL}" style='max-width: 600px; height:350px;'/>
         </a>
         `;
+      } else if (fileInputInfo.fileInfo.fileType === "video/mp4") {
+        fileHTML = `
+        <video width="400" controls>
+          <source src="${fileInputInfo.fileURL}" type="video/mp4">
+        </video>
+        `;
       }
+
       Object.assign(this.userChat, { File: fileHTML, fileURL: fileInputInfo.fileURL });
       let idKey = db.ref().child("FCCHAT").push().key;
       db.ref("FCCHAT/" + idKey)
