@@ -188,21 +188,7 @@
 
                     <div class="input-group">
 
-                        <div id="controls" class="d-none m-auto">
 
-                            <div class="d-flex justify-content-around">
-                                <button class="fa-solid fa-microphone-lines btn btn-primary" id="recordButton"></button>
-
-                                <button class="fa-regular fa-circle-pause btn btn-warning text-white" id="pauseButton"
-                                    disabled></button>
-                                <button class="fa-regular fa-circle-stop btn btn-danger" id="stopButton"
-                                    disabled></button>
-                                <div id="recordingsList"></div>
-
-                                <i class="btn btn-success fa-solid fa-circle-arrow-up d-none" id="btnVoiceSend"></i>
-
-                            </div>
-                        </div>
 
 
                         <i class="fa-solid fa-paperclip mt-2 mr-3" style="font-size: 19px; cursor: pointer;"
@@ -213,9 +199,20 @@
 
                         <span class="input-group-append m-auto">
                             <!-- Mikrofon Ayar Controller -->
-                            <div class="d-flex justify-content-center">
-                                <div id="voiceRecord_display" class="display"></div>
-                                <div id="voiceRecord_controllers" class="controllers">
+                            <div id="controls" class="d-none">
+                                <i class="fa-solid fa-xmark btn btn-sm" id="voiceClose"></i>
+                                <div class="d-flex justify-content-around">
+                                    <button class="fa-solid fa-microphone-lines btn btn-primary"
+                                        id="recordButton"></button>
+
+                                    <button class="fa-regular fa-circle-pause btn btn-warning text-white"
+                                        id="pauseButton" disabled></button>
+                                    <button class="fa-regular fa-circle-stop btn btn-danger" id="stopButton"
+                                        disabled></button>
+                                    <div id="recordingsList"></div>
+
+                                    <i class="btn btn-success fa-solid fa-circle-arrow-up d-none" id="btnVoiceSend"></i>
+
                                 </div>
                             </div>
                             <!-- Mikrofon Ayar Controller -->

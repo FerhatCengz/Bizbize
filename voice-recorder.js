@@ -142,7 +142,6 @@ $("#voiceStart").click(function (e) {
 });
 
 $("#btnVoiceSend").click(() => {
-  let timeIDKey = new Date().getTime();
   $("#voiceStart").show();
   $("#sendButton").show();
   $("#fileUpload").show();
@@ -151,6 +150,16 @@ $("#btnVoiceSend").click(() => {
   $("#voiceStart").removeClass("fa-solid fa-microphone");
 
   fileCreate();
+});
+
+$("#voiceClose").click(function (e) {
+  $("#voiceStart").show();
+  $("#sendButton").show();
+  $("#fileUpload").show();
+  $("#messageText").show();
+  $("#controls").addClass("d-none");
+  $("#voiceStart").addClass("fa-solid fa-microphone");
+
 });
 
 // var listRef = firebase.storage().ref("SesKayit/1673821659108");
