@@ -30,37 +30,48 @@ $(document).ready(function () {
 
     $("input[type=file]").change(function (e) {
       $("#proggcessContainer").show(500);
-      const files = fileInput.files[0];
-      const storageRef = ref(storage, "FCCHAT_FOLDER/" + new Date().getTime() + "_" + files.name);
-      const uploadTask = uploadBytesResumable(storageRef, files);
 
-      uploadTask.on("state_changed", (snapshot) => {
-        console.log("snapshot => ", snapshot);
-        var progress = Math.floor((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-        document.getElementById("proggcessLoad").style = `width: ${progress}%`;
-        if (progress == 100) {
-          setTimeout(() => {
-            getDownloadURL(storageRef)
-              .then((result) => {
-                console.log("files => ", files.name, files.type);
-                localStorage.setItem(
-                  "updateFilePath",
-                  JSON.stringify({
-                    fileURL: result,
-                    fileInfo: {
-                      fileName: files.name,
-                      fileType: files.type,
-                    },
-                  })
-                );
-                $("#fileSend").show(500);
+      const files = fileInput.files[0];
+      var metadata = {
+        contentType: files.type,
+      };
+
+      const storageRef = ref(storage, "FCCHAT_FOLDER/" + new Date().getTime() + "_" + files.name);
+      const uploadTask = uploadBytesResumable(storageRef, files, metadata);
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          var progress = Math.floor((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+          document.getElementById("proggcessLoad").style = `width: ${progress}%`;
+
+          switch (snapshot.state) {
+            case "cancel":
+              console.log("Upload is cancel");
+              break;
+            default:
+              console.log("default");
+              break;
+          }
+        },
+        (error) => {
+          console.log("error.code =>", error.code);
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            $("#fileSend").show(500);
+            localStorage.setItem(
+              "updateFilePath",
+              JSON.stringify({
+                fileURL: downloadURL,
+                fileInfo: {
+                  fileName: files.name,
+                  fileType: files.type,
+                },
               })
-              .catch((err) => {
-                Swal.fire("Dosya Yüklerken Bir Hata Oluştu", "Lütfen Dosyanın Bozuk Olmadığınından Emin Olun", "info");
-              });
-          }, 1500);
+            );
+          });
         }
-      });
+      );
 
       $("#fileCancel").click((e) => {
         uploadTask.cancel();

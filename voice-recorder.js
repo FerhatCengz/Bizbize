@@ -142,51 +142,93 @@ $("#voiceStart").click(function (e) {
 });
 
 $("#btnVoiceSend").click(() => {
+  let timeIDKey = new Date().getTime();
   $("#voiceStart").show();
   $("#sendButton").show();
   $("#fileUpload").show();
   $("#messageText").show();
   $("#controls").addClass("d-none");
-
   $("#voiceStart").removeClass("fa-solid fa-microphone");
-  const ref = firebase.storage().ref();
-  const file = globalBlob;
-  const task = ref.child("SesKayit" + "/" + new Date().getTime()).put(file);
-  task.on("state_changed", (snapshot) => {
-    var progress = Math.floor((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-    console.log(progress);
-    console.log(snapshot);
-    $("#voiceStart").text(progress + " %");
-    if (progress == 100) {
-      $("#loadingSpinner").addClass("d-none");
-      $("#btnVoiceSend").removeClass("d-none");
-      setTimeout(() => {
-        $("#voiceStart").addClass("fa-solid fa-microphone");
-        $("#voiceStart").text("");
 
-        snapshot.ref
-          .getDownloadURL()
-          .then((downloadURL) => {
-            let idKey = db.ref().child("FCCHAT").push().key;
-            db.ref("FCCHAT")
-              .child(idKey)
-              .child(firebase.auth().currentUser.uid)
-              .set({
-                File: `
-        <audio controls>
-          <source src="${downloadURL}"> type="audio/ogg" >
-      </audio>
-
-        `,
-                fileUrl: downloadURL,
-                messageDate: new Date().toLocaleString(),
-                userMessage: "",
-              });
-          })
-          .catch((err) => {
-            console.log(err.message);
-          });
-      }, 1000);
-    }
-  });
+  fileCreate();
 });
+
+// var listRef = firebase.storage().ref("SesKayit/1673821659108");
+// listRef
+//   .listAll()
+//   .then((res) => {
+//     console.log("res=>",res);
+//     res.items.forEach((itemRef) => {
+//       itemRef.getDownloadURL().then((url) => {
+//         console.log("url => " , url);
+//       });
+//     });
+//   })
+//   .catch((error) => {
+//     console.log(error.message);
+//   });
+
+/*
+            
+            
+*/
+
+const fileCreate = () => {
+  const storageRef = firebase.storage().ref();
+  // Create the file metadata
+  var metadata = {
+    contentType: globalBlob.type,
+  };
+
+  const file = globalBlob;
+  var uploadTask = storageRef.child("SesKayit/" + new Date().getTime()).put(file, metadata);
+  uploadTask.on(
+    firebase.storage.TaskEvent.STATE_CHANGED,
+    (snapshot) => {
+      var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      $("#voiceStart").text(progress.toFixed(2) + " %");
+    },
+    (error) => {
+      // A full list of error codes is available at
+      // https://firebase.google.com/docs/storage/web/handle-errors
+      console.log(error.code);
+      switch (error.code) {
+        case "storage/unauthorized":
+          // User doesn't have permission to access the object
+          break;
+        case "storage/canceled":
+          // User canceled the upload
+          break;
+
+        // ...
+
+        case "storage/unknown":
+          // Unknown error occurred, inspect error.serverResponse
+          break;
+      }
+    },
+    () => {
+      // Upload completed successfully, now we can get the download URL
+      uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+        console.log("File available at", downloadURL);
+        $("#voiceStart").text("");
+        $("#voiceStart").addClass("fa-solid fa-microphone");
+
+        let idKey = db.ref().child("FCCHAT").push().key;
+        db.ref("FCCHAT")
+          .child(idKey)
+          .child(firebase.auth().currentUser.uid)
+          .set({
+            File: `
+                  <audio controls='' class="w-100">
+                       <source src="${downloadURL}">
+                  </audio>
+      `,
+            fileUrl: downloadURL,
+            messageDate: new Date().toLocaleString(),
+            userMessage: "",
+          });
+      });
+    }
+  );
+};
