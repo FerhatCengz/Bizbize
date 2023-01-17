@@ -133,12 +133,19 @@ function createDownloadLink(blob) {
 }
 
 $("#voiceStart").click(function (e) {
-  $("#recordButton").click();
-  $("#voiceStart").hide();
-  $("#sendButton").hide();
-  $("#fileUpload").hide();
-  $("#messageText").hide();
-  $("#controls").removeClass("d-none");
+  navigator.mediaDevices
+    .getUserMedia({ audio: true })
+    .then(function (stream) {
+      $("#recordButton").click();
+      $("#voiceStart").hide();
+      $("#sendButton").hide();
+      $("#fileUpload").hide();
+      $("#messageText").hide();
+      $("#controls").removeClass("d-none");
+    })
+    .catch(function (error) {
+      Swal.fire("Tarayıcınızda Mikrofon Erişimini Açmanız Gerekiyor", "", "warning");
+    });
 });
 
 $("#btnVoiceSend").click(() => {
@@ -159,7 +166,6 @@ $("#voiceClose").click(function (e) {
   $("#messageText").show();
   $("#controls").addClass("d-none");
   $("#voiceStart").addClass("fa-solid fa-microphone");
-
 });
 
 // var listRef = firebase.storage().ref("SesKayit/1673821659108");

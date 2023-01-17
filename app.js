@@ -1,3 +1,4 @@
+//Firebase api ayarları
 var config = {
   apiKey: "AIzaSyAc02M_2Ofx0NJVYUo6lCOeojIuOrGPi_s",
   authDomain: "fir-todolist-8d567.firebaseapp.com",
@@ -10,19 +11,6 @@ var config = {
 firebase.initializeApp(config);
 let db = firebase.database();
 
-/*
-window.onbeforeunload = function (event) {
-  var message = "Important: Please click on 'Save' button to leave this page.";
-  if (typeof event == "undefined") {
-    event = window.event;
-  }
-  if (event) {
-    event.returnValue = message;
-  }
-  return message;
-};
-*/
-
 window.addEventListener("load", () => {
   //Bildirim desteği tarayıcıda var mı kontrol edeceğiz.
   if (!window.Notification) return;
@@ -30,11 +18,13 @@ window.addEventListener("load", () => {
   // console.log("Notification.permission= > ",Notification.permission);
 });
 
+
+//Mesaj attıktan sonra scrollu son mesaja çekmek için yapılandırılmıştır.
 const scrollDownEnd = () => {
   var objDiv = document.getElementById("messageBody");
   objDiv.scrollTop = objDiv.scrollHeight + 1000;
 };
-
+//Bildirim gönderirken yapılandırılan ayarlar.
 const sendNotifaciton = (userName, mesajContent, userImage) => {
   let notification = new Notification(userName + " Bir Mesaj Gönderdi", {
     body: mesajContent,
@@ -44,7 +34,7 @@ const sendNotifaciton = (userName, mesajContent, userImage) => {
     window.location.href = "index.html";
   };
 };
-
+//Vue.js başlangıç
 const app = Vue.createApp({
   data() {
     return {
@@ -60,13 +50,17 @@ const app = Vue.createApp({
         messageDate: new Date().toLocaleString(),
       },
 
+      //Tüm meajları getirir
       getAllMessage: {},
+      //Tüm kullanıcıları getirir
       userAllInfo: {},
+      //Çevrim içi sayısını gösterir
       onlieUserCount: 0,
     };
   },
 
   methods: {
+    //Kullanıcının çıkış yapmasını sağlayan fonksiyon
     userLogOut() {
       const logOutConClose = {
         online: false,
@@ -225,6 +219,8 @@ const app = Vue.createApp({
       this.userChat.userMessage = "";
     },
 
+    
+    //Belge resim vs. gibi şeyleri seçtikten sonra gönderme işlemi yapan fonksiyon
     fileSendButton() {
       const fileInputInfo = JSON.parse(localStorage.getItem("updateFilePath"));
       const fileType = JSON.parse(localStorage.getItem("updateFilePath")).fileInfo.fileType.split("/")[0];
@@ -268,6 +264,8 @@ const app = Vue.createApp({
       $("#proggcessContainer").hide();
     },
 
+    
+    //Son mesajı getirir ve bildirim eğer son mesaj atan kişi haricinde diğer kişilere gider.
     getAllMessageOnFirebase() {
       let endUserMessageUserID = [];
       db.ref("FCCHAT")
