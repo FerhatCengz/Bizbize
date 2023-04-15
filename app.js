@@ -1,12 +1,19 @@
 //Firebase api ayarları
 var config = {
-  apiKey: "AIzaSyAc02M_2Ofx0NJVYUo6lCOeojIuOrGPi_s",
+   apiKey: "AIzaSyArCzuo1W4wnmoYrShu7RyTtlLVMxk01i0",
+  authDomain: "fir-rtc-adcae.firebaseapp.com",
+  projectId: "fir-rtc-adcae",
+  storageBucket: "fir-rtc-adcae.appspot.com",
+  messagingSenderId: "800378018213",
+  appId: "1:800378018213:web:e5dac34d0e8d150a18704c"
+/*  apiKey: "AIzaSyAc02M_2Ofx0NJVYUo6lCOeojIuOrGPi_s",
   authDomain: "fir-todolist-8d567.firebaseapp.com",
   databaseURL: "https://fir-todolist-8d567-default-rtdb.firebaseio.com",
   projectId: "fir-todolist-8d567",
   storageBucket: "fir-todolist-8d567.appspot.com",
   messagingSenderId: "778315616968",
   appId: "1:778315616968:web:942ea7fdccbd15191d0bfd",
+  */
 };
 firebase.initializeApp(config);
 let db = firebase.database();
